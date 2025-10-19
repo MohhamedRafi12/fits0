@@ -113,7 +113,7 @@ ax.set_xlabel('x')
 ax.set_ylabel('y')
 ax.set_title(f"Least-Squares Fit ($\chi^2$/ndf = {chi2/dof:.2f})")
 ax.legend()
-fig.savefig('./LSQFit_py_example.pdf')
+# fig.savefig('./LSQFit_py_example.pdf')
 
 fig, axs = plt.subplots(2, 2, figsize=(10,10))
 plt.tight_layout()
@@ -142,15 +142,16 @@ from matplotlib.backends.backend_pdf import PdfPages
 with PdfPages("LSQFit_py.pdf") as pdf:
     # First figure: pseudoexperiment
     fig1, ax1 = plt.subplots(figsize=(6,4))
-    ax1.errorbar(lx, ly, yerr=ley, fmt='o', label='Pseudo-data')
+    ax1.errorbar(x, y, yerr=ey, fmt='o', label='Pseudo-data')
     xs = np.linspace(xmin, xmax, 400)
-    p, chi2, dof = wls_fit(lx, ly, ley)
+    p, chi2, dof = wls_fit(x, y, ey)
     ax1.plot(xs, f(xs, p), label='WLS fit')
     ax1.plot(xs, f(xs, pars), '--', label='Truth')
-    ax1.set_title(f"Pseudoexperiment (χ²/ndf = {chi2/dof:.2f})")
+    ax1.set_title(rf"Pseudoexperiment ($\chi^2$/ndf = {chi2/dof:.2f})")
     ax1.set_xlabel('x'); ax1.set_ylabel('y')
     ax1.legend()
-    pdf.savefig(fig1)        # save this figure as page 1
+    plt.tight_layout()
+    pdf.savefig(fig1)
     plt.close(fig1)
 
     # Second figure: parameter study (the 2×2 grid)
@@ -163,10 +164,11 @@ with PdfPages("LSQFit_py.pdf") as pdf:
     axs[1,0].hist2d(par_b, par_c, bins=60, range=[(0.7,1.9),(0.2,0.9)])
     axs[1,0].set_title('Parameter c vs b')
     axs[1,1].hist(chi2_reduced, bins=80, density=True)
-    axs[1,1].set_title('Reduced χ² distribution')
+    axs[1,1].set_title('Reduced $\chi^2$ distribution')
     for ax in axs.flat:
         ax.grid(True, alpha=0.25)
     fig2.suptitle('Least-squares study results')
+    plt.tight_layout()
     pdf.savefig(fig2)        # save as page 2
     plt.close(fig2)
 
