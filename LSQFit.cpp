@@ -7,6 +7,7 @@
 #include "TH1F.h"
 #include "TGClient.h"
 #include "TStyle.h"
+#include "TLine.h"
 
 
 #include "TMatrixD.h"
@@ -209,11 +210,56 @@ int main(int argc, char **argv){
 
   TString outname = "LSQFit_cpp.pdf";
 
-  // open PDF file (first page)
-  tc->Print(outname + "(", "pdf");   // "(" means start multipage PDF
-  tc2->Print(outname + ")", "pdf");  // ")" closes it
+  // 1D parameter histograms (ranges centered near truth)
+  TH1F *h_a = new TH1F("h_a","Parameter a; a; counts", 80, 0.2, 0.8);
+  TH1F *h_b = new TH1F("h_b","Parameter b; b; counts", 80, 0.7, 1.9);
+  TH1F *h_c = new TH1F("h_c","Parameter c; c; counts", 80, 0.2, 0.9);
 
-  cout << "Saved results to " << outname << endl;
+  for (int ie = 0; ie < nexperiments; ++ie) {
+    double ybuf[npoints], eybuf[npoints];
+    getY(xbuf, ybuf, eybuf);
+
+    FitResult r = wls_fit(xbuf, ybuf, eybuf, npoints);
+
+    h1->Fill(r.a, r.b);
+    h2->Fill(r.a, r.c);
+    h3->Fill(r.b, r.c);
+    h4->Fill(r.chi2 / r.dof, 1.0 / nexperiments);
+
+    // 1D parameter histograms
+    h_a->Fill(r.a);
+    h_b->Fill(r.b);
+    h_c->Fill(r.c);
+  }
+
+  TCanvas *tc3 = new TCanvas("c3","Parameter 1D histograms", 220,220,dw,dh);
+  tc3->Divide(3,1);
+
+  // a
+  tc3->cd(1);
+  h_a->Draw("HIST");
+  TLine la(0.5, 0.0, 0.5, h_a->GetMaximum());
+  la.SetLineStyle(2); la.SetLineColor(kBlack); la.Draw();
+
+  // b
+  tc3->cd(2);
+  h_b->Draw("HIST");
+  TLine lb(1.3, 0.0, 1.3, h_b->GetMaximum());
+  lb.SetLineStyle(2); lb.SetLineColor(kBlack); lb.Draw();
+
+  // c
+  tc3->cd(3);
+  h_c->Draw("HIST");
+  TLine lc(0.5, 0.0, 0.5, h_c->GetMaximum());
+  lc.SetLineStyle(2); lc.SetLineColor(kBlack); lc.Draw();
+
+  tc3->Modified(); tc3->Update();
+
+  // open PDF file (first page)
+  tc->Print(outname + "(", "pdf");   // open multipage
+  tc2->Print(outname,      "pdf");   // middle pages
+  tc3->Print(outname + ")", "pdf");  // close multipage
+  std::cout << "Saved results to " << outname << std::endl;
 
   // **************************************
   

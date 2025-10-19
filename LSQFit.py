@@ -172,4 +172,24 @@ with PdfPages("LSQFit_py.pdf") as pdf:
     pdf.savefig(fig2)        # save as page 2
     plt.close(fig2)
 
+    fig3, ax3 = plt.subplots(1, 3, figsize=(12,4), sharey=True)
+    bins = 60
+    ax3[0].hist(par_a, bins=bins, color='tab:blue', alpha=0.7)
+    ax3[0].axvline(pars[0], color='k', ls='--')
+    ax3[0].set_xlabel('a'); ax3[0].set_title('Distribution of a')
+
+    ax3[1].hist(par_b, bins=bins, color='tab:orange', alpha=0.7)
+    ax3[1].axvline(pars[1], color='k', ls='--')
+    ax3[1].set_xlabel('b'); ax3[1].set_title('Distribution of b')
+
+    ax3[2].hist(par_c, bins=bins, color='tab:green', alpha=0.7)
+    ax3[2].axvline(pars[2], color='k', ls='--')
+    ax3[2].set_xlabel('c'); ax3[2].set_title('Distribution of c')
+
+    for a in ax3: a.grid(True, alpha=0.25)
+    fig3.suptitle('1D Parameter Distributions (dashed = truth)')
+    plt.tight_layout()
+    pdf.savefig(fig3)
+    plt.close(fig3)
+
 # **************************************
